@@ -1,0 +1,33 @@
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+env:
+  CI: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Use cached node_modules
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: node_modules+${{ hashFiles('**/yarn.lock') }}
+
+    - name: Install
+      run: yarn install --immutable
+
+    - name: Lint
+      run: yarn lint
+
+    - name: Typecheck
+      run: yarn typecheck
