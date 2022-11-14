@@ -23,6 +23,9 @@
   "peerDependencies": {
     "jest": "^29.0.0"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
