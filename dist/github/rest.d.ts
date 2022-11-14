@@ -1,0 +1,13 @@
+import { type Octokit as TOctokit, RestEndpointMethodTypes } from "@octokit/rest";
+import { GitHubOptions } from "./types";
+declare type ExtractParameters<T> = "parameters" extends keyof T ? T["parameters"] : never;
+declare type ExtractResponse<T> = "response" extends keyof T ? T["response"] : never;
+declare type RestApis = TOctokit;
+declare type Scopes = keyof RestEndpointMethodTypes & keyof RestApis;
+declare type MethodName<S extends Scopes> = keyof RestEndpointMethodTypes[S] & keyof RestApis[S];
+declare type Params<S extends Scopes, M extends MethodName<S>> = ExtractParameters<RestEndpointMethodTypes[S][M]>;
+declare type Response<S extends Scopes, M extends MethodName<S>> = ExtractResponse<RestEndpointMethodTypes[S][M]>;
+declare type GitHubMethod<S extends Scopes, M extends MethodName<S>> = (params: Params<S, M>, options?: GitHubOptions) => Promise<Response<S, M>>;
+export declare const getPullRequest: GitHubMethod<"pulls", "get">;
+export declare const createCommitStatus: GitHubMethod<"repos", "createCommitStatus">;
+export {};
