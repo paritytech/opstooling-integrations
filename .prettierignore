@@ -1,0 +1,4 @@
+node_modules
+.env.cjs
+.git
+yarn-error.log
