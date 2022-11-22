@@ -8,6 +8,7 @@
   "dependencies": {
     "@octokit/auth-app": "^4.0.7",
     "@octokit/core": "^4.1.0",
+    "@octokit/plugin-paginate-rest": "^5.0.1",
     "@octokit/plugin-throttling": "^4.3.2",
     "@octokit/rest": "^19.0.5",
     "joi": "^17.6.4",
