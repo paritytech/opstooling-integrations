@@ -1,8 +1,7 @@
+import { composePaginateRest, PaginatingEndpoints } from "@octokit/plugin-paginate-rest";
 import { type Octokit as TOctokit, RestEndpointMethodTypes } from "@octokit/rest";
 
-import { defaultLogger } from "src/utils";
-
-import { bindLogger, getConfigOptsFromEnv, setupCommonInstance } from "./setup";
+import { resolveSetup } from "./setup";
 import { GitHubOptions } from "./types";
 
 type ExtractParameters<T> = "parameters" extends keyof T ? T["parameters"] : never;
@@ -17,28 +16,33 @@ function makeMethod<S extends Scopes, M extends MethodName<S>>(scope: S, methodN
     params: ExtractParameters<RestEndpointMethodTypes[S][M]>,
     options?: GitHubOptions,
   ): Promise<ExtractResponse<RestEndpointMethodTypes[S][M]>> => {
-    const instance: TOctokit = options?.octokitInstance ?? (await setupCommonInstance(getConfigOptsFromEnv()));
-    const logger = options?.logger ?? defaultLogger;
-
-    bindLogger(instance, logger);
+    const { octokit } = await resolveSetup(options);
 
     /* Spent several hours trying to make this work, not sure if that's TS in general or typings of Octokit,
        but nothing except `any` worked here */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-call
-    return (instance[scope][methodName] as any)(params);
+    return (octokit[scope][methodName] as any)(params);
   };
 }
 
-type Params<S extends Scopes, M extends MethodName<S>> = ExtractParameters<RestEndpointMethodTypes[S][M]>;
-type Response<S extends Scopes, M extends MethodName<S>> = ExtractResponse<RestEndpointMethodTypes[S][M]>;
+type DataType<T> = "data" extends keyof T ? T["data"] : unknown;
 
-type GitHubMethod<S extends Scopes, M extends MethodName<S>> = (
-  params: Params<S, M>,
-  options?: GitHubOptions,
-) => Promise<Response<S, M>>;
+function makePaginateMethod<R extends keyof PaginatingEndpoints>(route: R) {
+  return async (
+    params: PaginatingEndpoints[R]["parameters"],
+    options?: GitHubOptions,
+  ): Promise<DataType<PaginatingEndpoints[R]["response"]>> => {
+    const { octokit } = await resolveSetup(options);
+    return await composePaginateRest(octokit, route, { ...params, per_page: 100 });
+  };
+}
 
-export const getPullRequest: GitHubMethod<"pulls", "get"> = makeMethod("pulls", "get");
-export const createCommitStatus: GitHubMethod<"repos", "createCommitStatus"> = makeMethod(
-  "repos",
-  "createCommitStatus",
-);
+export const getAppInstallations = makePaginateMethod("GET /app/installations");
+export const getBranches = makePaginateMethod("GET /repos/{owner}/{repo}/branches");
+export const getBranch = makeMethod("repos", "getBranch");
+export const getPullRequest = makeMethod("pulls", "get");
+export const getPullRequests = makePaginateMethod("GET /repos/{owner}/{repo}/pulls");
+export const getRepository = makeMethod("repos", "get");
+export const getTag = makeMethod("git", "getTag");
+export const getTags = makePaginateMethod("GET /repos/{owner}/{repo}/tags");
+export const createCommitStatus = makeMethod("repos", "createCommitStatus");

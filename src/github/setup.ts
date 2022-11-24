@@ -5,13 +5,14 @@ import { Octokit } from "@octokit/rest";
 import { Logger, validate } from "opstooling-js";
 
 import { GitHubConfigOpts } from "src/github";
+import { GitHubOptions } from "src/github/types";
 import {
   GitHubAppAuthSchema,
   GitHubAppInstallationAuthSchema,
   GitHubTokenAuthSchema,
 } from "src/schemas/GitHubConfigEnvSchema";
 import { GitHubAppAuthEnv, GitHubAppInstallationAuthEnv, GitHubTokenAuthEnv } from "src/types/generated";
-import { lazyApi } from "src/utils";
+import { defaultLogger, lazyApi } from "src/utils";
 
 export function getInstance(opts: GitHubConfigOpts): Promise<Octokit> {
   let authStrategy: OctokitOptions["authStrategy"];
@@ -61,6 +62,20 @@ export function getInstance(opts: GitHubConfigOpts): Promise<Octokit> {
     new Octokit({ authStrategy, auth, baseUrl: opts.apiEndpoint ?? "https://api.github.com", throttle }),
   );
   /* eslint-enable @typescript-eslint/no-unsafe-assignment */
+}
+
+export type Setup = {
+  octokit: Octokit;
+  logger: Logger;
+};
+
+export async function resolveSetup(options?: GitHubOptions): Promise<Setup> {
+  const octokit: Octokit = options?.octokitInstance ?? (await setupCommonInstance(getConfigOptsFromEnv()));
+  const logger = options?.logger ?? defaultLogger;
+
+  bindLogger(octokit, logger);
+
+  return { octokit, logger };
 }
 
 export function bindLogger(octokit: Octokit, logger: Logger): void {
