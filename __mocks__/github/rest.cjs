@@ -12,3 +12,5 @@ exports.createCommitStatus = jest.fn(({ target_url, state, context }) => {
   const id = Math.floor(Math.random() * 1000);
   return Promise.resolve({ status: 201, data: { url: `https://example.com/${id}`, state, target_url, context, id } });
 });
+
+exports.isGithubOrganizationMember = jest.fn(async () => Promise.resolve(false));

@@ -5,7 +5,7 @@ import { Octokit } from "@octokit/rest";
 import { Logger, validate } from "opstooling-js";
 
 import { GitHubConfigOpts } from "src/github";
-import { GitHubOptions } from "src/github/types";
+import { GitHubInstance, GitHubOptions } from "src/github/types";
 import {
   GitHubAppAuthSchema,
   GitHubAppInstallationAuthSchema,
@@ -14,7 +14,7 @@ import {
 import { GitHubAppAuthEnv, GitHubAppInstallationAuthEnv, GitHubTokenAuthEnv } from "src/types/generated";
 import { defaultLogger, lazyApi } from "src/utils";
 
-export function getInstance(opts: GitHubConfigOpts): Promise<Octokit> {
+export function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
   let authStrategy: OctokitOptions["authStrategy"];
   let auth: OctokitOptions["auth"];
 
@@ -58,19 +58,25 @@ export function getInstance(opts: GitHubConfigOpts): Promise<Octokit> {
 
   // Octokit is typed with a bunch of `any`s
   /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-  return Promise.resolve(
-    new Octokit({ authStrategy, auth, baseUrl: opts.apiEndpoint ?? "https://api.github.com", throttle }),
-  );
+  const octokitInstance = new Octokit({
+    authStrategy,
+    auth,
+    baseUrl: opts.apiEndpoint ?? "https://api.github.com",
+    throttle,
+  });
+  const token = auth.token;
+
+  return Promise.resolve({ ...octokitInstance, token });
   /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 }
 
 export type Setup = {
-  octokit: Octokit;
+  octokit: GitHubInstance;
   logger: Logger;
 };
 
 export async function resolveSetup(options?: GitHubOptions): Promise<Setup> {
-  const octokit: Octokit = options?.octokitInstance ?? (await setupCommonInstance(getConfigOptsFromEnv()));
+  const octokit: GitHubInstance = options?.octokitInstance ?? (await setupCommonInstance(getConfigOptsFromEnv()));
   const logger = options?.logger ?? defaultLogger;
 
   bindLogger(octokit, logger);
@@ -87,7 +93,7 @@ export function bindLogger(octokit: Octokit, logger: Logger): void {
   });
 }
 
-export const setupCommonInstance: (opts: GitHubConfigOpts) => Promise<Octokit> = lazyApi(getInstance);
+export const setupCommonInstance: (opts: GitHubConfigOpts) => Promise<GitHubInstance> = lazyApi(getInstance);
 
 export function getConfigOptsFromEnv(): GitHubConfigOpts {
   const message = "Invalid environment for GitHub integration. Consult README.md";
@@ -127,4 +133,9 @@ export function getConfigOptsFromEnv(): GitHubConfigOpts {
       authToken: tokenAuthEnv.GITHUB_TOKEN,
     };
   }
+}
+
+export async function getFetchEndpoint(options?: GitHubOptions): Promise<{ token: string; url: string }> {
+  const setup = await resolveSetup(options);
+  return { url: `https://x-access-token:${setup.octokit.token}@github.com`, token: setup.octokit.token };
 }
