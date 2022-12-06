@@ -63,3 +63,23 @@ export async function isGithubOrganizationMember(
     throw e;
   }
 }
+
+export async function isGithubTeamMember(
+  params: { org: string; team: string; username: string },
+  options?: GitHubOptions,
+): Promise<boolean> {
+  const { octokit } = await resolveSetup(options);
+  try {
+    const res = await octokit.teams.getMembershipForUserInOrg({
+      org: params.org,
+      username: params.username,
+      team_slug: params.team,
+    });
+    return res.data.state === "active";
+  } catch (e) {
+    if (e.status === 404) {
+      return false;
+    }
+    throw e;
+  }
+}

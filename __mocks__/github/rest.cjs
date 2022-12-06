@@ -14,3 +14,4 @@ exports.createCommitStatus = jest.fn(({ target_url, state, context }) => {
 });
 
 exports.isGithubOrganizationMember = jest.fn(async () => Promise.resolve(false));
+exports.isGithubTeamMember = jest.fn(async () => Promise.resolve(false));
