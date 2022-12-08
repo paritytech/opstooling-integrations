@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 import { BaseOptions } from "src/types";
 
 export type GitHubOptions = BaseOptions & {
-  octokitInstance?: Octokit;
+  octokitInstance?: GitHubInstance;
 };
 
 type GitHubConfigBaseOpts = {
@@ -29,3 +29,5 @@ type GitHubConfigTokenAuthOpts = GitHubConfigBaseOpts & {
 };
 
 export type GitHubConfigOpts = GitHubConfigAppAuthOpts | GitHubConfigInstallationAuthOpts | GitHubConfigTokenAuthOpts;
+
+export type GitHubInstance = Octokit & { token: string };

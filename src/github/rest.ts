@@ -46,3 +46,40 @@ export const getRepository = makeMethod("repos", "get");
 export const getTag = makeMethod("git", "getTag");
 export const getTags = makePaginateMethod("GET /repos/{owner}/{repo}/tags");
 export const createCommitStatus = makeMethod("repos", "createCommitStatus");
+
+export async function isGithubOrganizationMember(
+  params: { org: string; username: string },
+  options?: GitHubOptions,
+): Promise<boolean> {
+  const { octokit } = await resolveSetup(options);
+  try {
+    const res = await octokit.orgs.checkMembershipForUser(params);
+    // Somehow, TS thinks that res.status can be only 302, but in reality, it can be anything
+    return (res.status as number) === 204;
+  } catch (e) {
+    if (e.status === 404) {
+      return false;
+    }
+    throw e;
+  }
+}
+
+export async function isGithubTeamMember(
+  params: { org: string; team: string; username: string },
+  options?: GitHubOptions,
+): Promise<boolean> {
+  const { octokit } = await resolveSetup(options);
+  try {
+    const res = await octokit.teams.getMembershipForUserInOrg({
+      org: params.org,
+      username: params.username,
+      team_slug: params.team,
+    });
+    return res.data.state === "active";
+  } catch (e) {
+    if (e.status === 404) {
+      return false;
+    }
+    throw e;
+  }
+}
