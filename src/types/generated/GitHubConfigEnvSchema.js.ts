@@ -7,8 +7,6 @@ export interface GitHubAppAuthEnv {
   GITHUB_APP_ID: string;
   GITHUB_AUTH_TYPE: "app";
   GITHUB_BASE_URL?: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
   GITHUB_PRIVATE_KEY: string;
 }
 
@@ -16,10 +14,15 @@ export interface GitHubAppInstallationAuthEnv {
   GITHUB_APP_ID: string;
   GITHUB_AUTH_TYPE: "installation";
   GITHUB_BASE_URL?: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
   GITHUB_INSTALLATION_ID: string;
   GITHUB_PRIVATE_KEY: string;
+}
+
+export interface GitHubAppOAuthEnv {
+  GITHUB_AUTH_TYPE: "oauth";
+  GITHUB_BASE_URL?: string;
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
 }
 
 export interface GitHubTokenAuthEnv {

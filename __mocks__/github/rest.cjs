@@ -12,6 +12,14 @@ exports.createCommitStatus = jest.fn(({ target_url, state, context }) => {
   const id = Math.floor(Math.random() * 1000);
   return Promise.resolve({ status: 201, data: { url: `https://example.com/${id}`, state, target_url, context, id } });
 });
+exports.createComment = jest.fn(({ owner, repo, issue_number, body }) => {
+  const id = Math.floor(Math.random() * 1000);
+  return Promise.resolve({
+    status: 201,
+    data: { url: `https://example.com/repos/${owner}/${repo}/issues/${issue_number}/comments/${id}`, body, id },
+  });
+});
+exports.getRepoInstallation = jest.fn(async () => Promise.reject({ status: 404, message: "Not found" }));
 
 exports.isGithubOrganizationMember = jest.fn(async () => Promise.resolve(false));
 exports.isGithubTeamMember = jest.fn(async () => Promise.resolve(false));

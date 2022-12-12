@@ -3,4 +3,4 @@
  * Do not modify this file manually
  */
 
-export * from "./GitHubConfigEnv";
+export * from "./GitHubConfigEnvSchema.js";

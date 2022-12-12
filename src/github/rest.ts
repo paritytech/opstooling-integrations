@@ -38,6 +38,7 @@ function makePaginateMethod<R extends keyof PaginatingEndpoints>(route: R) {
 }
 
 export const getAppInstallations = makePaginateMethod("GET /app/installations");
+export const getRepoInstallation = makeMethod("apps", "getRepoInstallation");
 export const getBranches = makePaginateMethod("GET /repos/{owner}/{repo}/branches");
 export const getBranch = makeMethod("repos", "getBranch");
 export const getPullRequest = makeMethod("pulls", "get");
@@ -46,6 +47,7 @@ export const getRepository = makeMethod("repos", "get");
 export const getTag = makeMethod("git", "getTag");
 export const getTags = makePaginateMethod("GET /repos/{owner}/{repo}/tags");
 export const createCommitStatus = makeMethod("repos", "createCommitStatus");
+export const createComment = makeMethod("issues", "createComment");
 
 export async function isGithubOrganizationMember(
   params: { org: string; username: string },

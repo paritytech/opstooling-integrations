@@ -7,6 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@octokit/auth-app": "^4.0.7",
+    "@octokit/auth-oauth-app": "^5.0.4",
     "@octokit/core": "^4.1.0",
     "@octokit/plugin-paginate-rest": "^5.0.1",
     "@octokit/plugin-throttling": "^4.3.2",
