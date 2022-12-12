@@ -1,4 +1,5 @@
 import { createAppAuth } from "@octokit/auth-app";
+import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
 import { OctokitOptions } from "@octokit/core/dist-types/types";
 import { ThrottlingOptions } from "@octokit/plugin-throttling/dist-types/types";
 import { Octokit } from "@octokit/rest";
@@ -9,9 +10,15 @@ import { GitHubInstance, GitHubOptions } from "src/github/types";
 import {
   GitHubAppAuthSchema,
   GitHubAppInstallationAuthSchema,
+  GitHubAppOAuthSchema,
   GitHubTokenAuthSchema,
 } from "src/schemas/GitHubConfigEnvSchema";
-import { GitHubAppAuthEnv, GitHubAppInstallationAuthEnv, GitHubTokenAuthEnv } from "src/types/generated";
+import {
+  GitHubAppAuthEnv,
+  GitHubAppInstallationAuthEnv,
+  GitHubAppOAuthEnv,
+  GitHubTokenAuthEnv,
+} from "src/types/generated";
 import { defaultLogger, lazyApi } from "src/utils";
 
 export function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
@@ -20,14 +27,16 @@ export function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
 
   switch (opts.authType) {
     case "app":
+      authStrategy = createAppAuth;
+      auth = { appId: opts.appId, privateKey: opts.privateKey };
+      break;
     case "installation":
       authStrategy = createAppAuth;
-      auth = {
-        appId: opts.appId,
-        clientId: opts.clientId,
-        clientSecret: opts.clientSecret,
-        privateKey: opts.privateKey,
-      };
+      auth = { appId: opts.appId, installationId: opts.installationId, privateKey: opts.privateKey };
+      break;
+    case "oauth":
+      authStrategy = createOAuthAppAuth;
+      auth = { clientId: opts.clientId, clientSecret: opts.clientSecret };
       break;
     case "token":
       auth = opts.authToken;
@@ -98,35 +107,39 @@ export const setupCommonInstance: (opts: GitHubConfigOpts) => Promise<GitHubInst
 export function getConfigOptsFromEnv(): GitHubConfigOpts {
   const message = "Invalid environment for GitHub integration. Consult README.md";
 
+  if (process.env.GITHUB_PRIVATE_KEY_BASE64 && !process.env.GITHUB_PRIVATE_KEY) {
+    process.env.GITHUB_PRIVATE_KEY = Buffer.from(process.env.GITHUB_PRIVATE_KEY_BASE64, "base64").toString();
+  }
+
   if (process.env.GITHUB_AUTH_TYPE === "app") {
-    const appAuthEnv: GitHubAppAuthEnv = validate<GitHubAppAuthEnv>(process.env, GitHubAppAuthSchema, { message });
+    const appAuthEnv = validate<GitHubAppAuthEnv>(process.env, GitHubAppAuthSchema, { message });
     return {
       authType: "app",
       ...(appAuthEnv.GITHUB_BASE_URL && { apiEndpoint: appAuthEnv.GITHUB_BASE_URL }),
       appId: appAuthEnv.GITHUB_APP_ID,
-      clientId: appAuthEnv.GITHUB_CLIENT_ID,
-      clientSecret: appAuthEnv.GITHUB_CLIENT_SECRET,
       privateKey: appAuthEnv.GITHUB_PRIVATE_KEY,
     };
   } else if (process.env.GITHUB_AUTH_TYPE === "installation") {
-    const installationAuthEnv: GitHubAppInstallationAuthEnv = validate<GitHubAppInstallationAuthEnv>(
-      process.env,
-      GitHubAppInstallationAuthSchema,
-      { message },
-    );
+    const installationAuthEnv = validate<GitHubAppInstallationAuthEnv>(process.env, GitHubAppInstallationAuthSchema, {
+      message,
+    });
     return {
       authType: "installation",
       ...(installationAuthEnv.GITHUB_BASE_URL && { apiEndpoint: installationAuthEnv.GITHUB_BASE_URL }),
       appId: installationAuthEnv.GITHUB_APP_ID,
-      clientId: installationAuthEnv.GITHUB_CLIENT_ID,
-      clientSecret: installationAuthEnv.GITHUB_CLIENT_SECRET,
       privateKey: installationAuthEnv.GITHUB_PRIVATE_KEY,
       installationId: installationAuthEnv.GITHUB_INSTALLATION_ID,
     };
+  } else if (process.env.GITHUB_AUTH_TYPE === "oauth") {
+    const installationPrivkeyAuthEnv = validate<GitHubAppOAuthEnv>(process.env, GitHubAppOAuthSchema, { message });
+    return {
+      authType: "oauth",
+      ...(installationPrivkeyAuthEnv.GITHUB_BASE_URL && { apiEndpoint: installationPrivkeyAuthEnv.GITHUB_BASE_URL }),
+      clientId: installationPrivkeyAuthEnv.GITHUB_CLIENT_ID,
+      clientSecret: installationPrivkeyAuthEnv.GITHUB_CLIENT_SECRET,
+    };
   } else {
-    const tokenAuthEnv: GitHubTokenAuthEnv = validate<GitHubTokenAuthEnv>(process.env, GitHubTokenAuthSchema, {
-      message,
-    });
+    const tokenAuthEnv = validate<GitHubTokenAuthEnv>(process.env, GitHubTokenAuthSchema, { message });
     return {
       authType: "token",
       ...(tokenAuthEnv.GITHUB_BASE_URL && { apiEndpoint: tokenAuthEnv.GITHUB_BASE_URL }),

@@ -13,14 +13,20 @@ type GitHubConfigBaseOpts = {
 type GitHubConfigAppAuthOpts = GitHubConfigBaseOpts & {
   authType: "app";
   appId: string;
-  clientId: string;
-  clientSecret: string;
   privateKey: string;
 };
 
-type GitHubConfigInstallationAuthOpts = Omit<GitHubConfigAppAuthOpts, "authType"> & {
+type GitHubConfigInstallationPrivkeyAuthOpts = GitHubConfigBaseOpts & {
   authType: "installation";
+  appId: string;
+  privateKey: string;
   installationId: string;
+};
+
+type GitHubConfigInstallationOAuthOpts = GitHubConfigBaseOpts & {
+  authType: "oauth";
+  clientId: string;
+  clientSecret: string;
 };
 
 type GitHubConfigTokenAuthOpts = GitHubConfigBaseOpts & {
@@ -28,6 +34,10 @@ type GitHubConfigTokenAuthOpts = GitHubConfigBaseOpts & {
   authToken: string;
 };
 
-export type GitHubConfigOpts = GitHubConfigAppAuthOpts | GitHubConfigInstallationAuthOpts | GitHubConfigTokenAuthOpts;
+export type GitHubConfigOpts =
+  | GitHubConfigAppAuthOpts
+  | GitHubConfigInstallationPrivkeyAuthOpts
+  | GitHubConfigInstallationOAuthOpts
+  | GitHubConfigTokenAuthOpts;
 
 export type GitHubInstance = Octokit & { token: string };

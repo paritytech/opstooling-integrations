@@ -14,6 +14,7 @@ All integrations are unified under similar API, with following rules in mind:
 * All retry / rate-limiting logic should also be implemented in this module.
 
 #### Using mocks and fixtures
+
 ```ts
 // module.ts
 import { github } from "opstooling-integrations";
@@ -22,6 +23,7 @@ export async function foo() {
   await github.createCommitStatus({...});
 }
 ```
+
 ```ts
 // module.spec.ts
 import { describe, expect, it, jest } from "@jest/globals";
@@ -46,13 +48,35 @@ describe("foo", () => {
 
 #### Configuration
 
-| Environment variable   | Option for getInstance() | Description                                                       | Required?                                      | Default value            |
-|------------------------|--------------------------|-------------------------------------------------------------------|------------------------------------------------|--------------------------|
-| GITHUB_AUTH_TYPE       | authType                 | How to authorize in GitHub. Can be `token`, `app`, `installation` | no                                             | `token`                  |
-| GITHUB_APP_ID          | appId                    | GitHub app ID                                                     | yes, if `authType` is `app`, or `installation` | -                        |
-| GITHUB_CLIENT_ID       | clientId                 | GitHub client ID                                                  | yes, if `authType` is `app` or `installation`                   | -                        |
-| GITHUB_CLIENT_SECRET   | clientSecret             | GitHub client secret                                              | yes, if `authType` is `app` or `installation`                    | -                        |
-| GITHUB_PRIVATE_KEY     | privateKey               | GitHub app private key                                            | yes, if `authType` is `app` or `installation`                    | -                        |
-| GITHUB_TOKEN           | authToken                | GitHub auth token. Can be personal, oauth, etc.                   | yes, if `authType` is `token`                  | -                        |
-| GITHUB_INSTALLATION_ID | installationId           | GitHub app installation id                                        | if `authType` is `installation`                | -                        |
-| GITHUB_BASE_URL        | baseUrl                  | API endpoint URL                                                  | no                                             | `https://api.github.com` |
+Four auth types are supported: `app`, `installation`, `oauth`, and `token`.
+
+###### `app` auth
+
+Non-installation auth type for GitHub Apps. Using this means that org/repo permissions aren't accessible.  
+Requires `appId` and `privateKey`.
+
+###### `installation` auth
+
+This type is used to authorize requests for specific org/repo application installation. Requires `installationId`,
+which can be resolved using `app` auth. If app expected to have only one installation, then it can be configured through
+environment. Otherwise, use `github.getInstance` and pass the instance further.  
+Requires `appId`, `privateKey` and `installationId`.
+
+###### `oauth` auth
+
+This auth type requires `clientId` and `clientSecret`, and provides classic OAuth for GitHub Apps.
+
+###### `token` auth
+
+Simplest of all, requires only `token`, works for personal tokens or oauth tokens.
+
+| Environment variable                            | Option for getInstance() | Description                                                                             | Required?                                      | Default value            |
+|-------------------------------------------------|--------------------------|-----------------------------------------------------------------------------------------|------------------------------------------------|--------------------------|
+| GITHUB_AUTH_TYPE                                | authType                 | `app`, `token`, `installation`, or `oauth`                                              | no                                             | `token`                  |
+| GITHUB_APP_ID                                   | appId                    | GitHub app ID                                                                           | yes, if `authType` is `app`, or `installation` | -                        |
+| GITHUB_CLIENT_ID                                | clientId                 | GitHub client ID                                                                        | yes, if `authType` is `oauth`                  | -                        |
+| GITHUB_CLIENT_SECRET                            | clientSecret             | GitHub client secret                                                                    | yes, if `authType` is `oauth`                  | -                        |
+| GITHUB_PRIVATE_KEY or GITHUB_PRIVATE_KEY_BASE64 | privateKey               | GitHub app private key. <br/>Use GITHUB_PRIVATE_KEY_BASE64 to curcumvent newline issues | yes, if `authType` is `app` or `installation`  | -                        |
+| GITHUB_TOKEN                                    | authToken                | GitHub auth token. Can be personal, oauth, etc.                                         | yes, if `authType` is `token`                  | -                        |
+| GITHUB_INSTALLATION_ID                          | installationId           | GitHub app installation id                                                              | if `authType` is `installation`                | -                        |
+| GITHUB_BASE_URL                                 | baseUrl                  | API endpoint URL                                                                        | no                                             | `https://api.github.com` |
