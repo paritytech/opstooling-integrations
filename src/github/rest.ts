@@ -15,13 +15,13 @@ function makeMethod<S extends Scopes, M extends MethodName<S>>(scope: S, methodN
   return async (
     params: ExtractParameters<RestEndpointMethodTypes[S][M]>,
     options?: GitHubOptions,
-  ): Promise<ExtractResponse<RestEndpointMethodTypes[S][M]>> => {
+  ): Promise<DataType<ExtractResponse<RestEndpointMethodTypes[S][M]>>> => {
     const { octokit } = await resolveSetup(options);
 
     /* Spent several hours trying to make this work, not sure if that's TS in general or typings of Octokit,
        but nothing except `any` worked here */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-call
-    return (octokit[scope][methodName] as any)(params);
+    return (await (octokit[scope][methodName] as any)(params)).data;
   };
 }
 
@@ -45,6 +45,7 @@ export const getPullRequest = makeMethod("pulls", "get");
 export const getPullRequests = makePaginateMethod("GET /repos/{owner}/{repo}/pulls");
 export const getRepository = makeMethod("repos", "get");
 export const getTag = makeMethod("git", "getTag");
+export const listMatchingRefs = makeMethod("git", "listMatchingRefs");
 export const getTags = makePaginateMethod("GET /repos/{owner}/{repo}/tags");
 export const createCommitStatus = makeMethod("repos", "createCommitStatus");
 export const createComment = makeMethod("issues", "createComment");
