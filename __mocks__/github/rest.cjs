@@ -5,6 +5,7 @@ exports.getBranches = jest.fn(async () => Promise.resolve([]));
 exports.getBranch = jest.fn(async () => Promise.reject({ status: 404, message: "Not found" }));
 exports.getPullRequest = jest.fn(async () => Promise.reject({ status: 404, message: "Not found" }));
 exports.getPullRequests = jest.fn(async () => Promise.resolve([]));
+exports.listMatchingRefs = jest.fn(async () => Promise.resolve([]));
 exports.getReposotory = jest.fn(async () => Promise.reject({ status: 404, message: "Not found" }));
 exports.getTag = jest.fn(async () => Promise.reject({ status: 404, message: "Not found" }));
 exports.getTags = jest.fn(async () => Promise.resolve([]));
