@@ -18,13 +18,6 @@ export interface GitHubAppInstallationAuthEnv {
   GITHUB_PRIVATE_KEY: string;
 }
 
-export interface GitHubAppOAuthEnv {
-  GITHUB_AUTH_TYPE: "oauth";
-  GITHUB_BASE_URL?: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
-}
-
 export interface GitHubTokenAuthEnv {
   GITHUB_AUTH_TYPE?: "token";
   GITHUB_BASE_URL?: string;

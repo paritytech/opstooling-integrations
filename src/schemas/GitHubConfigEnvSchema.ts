@@ -19,14 +19,6 @@ export const GitHubAppInstallationAuthSchema = GitHubConfigEnvBaseSchema.concat(
   }),
 ).meta({ className: "GitHubAppInstallationAuthEnv" });
 
-export const GitHubAppOAuthSchema = GitHubConfigEnvBaseSchema.concat(
-  Joi.object({
-    GITHUB_AUTH_TYPE: Joi.string().allow(Joi.override, "oauth").required(),
-    GITHUB_CLIENT_ID: Joi.string().required(),
-    GITHUB_CLIENT_SECRET: Joi.string().required(),
-  }),
-).meta({ className: "GitHubAppOAuthEnv" });
-
 export const GitHubTokenAuthSchema = GitHubConfigEnvBaseSchema.concat(
   Joi.object({ GITHUB_AUTH_TYPE: Joi.string().allow("token"), GITHUB_TOKEN: Joi.string().required() }),
 ).meta({ className: "GitHubTokenAuthEnv" });

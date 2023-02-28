@@ -1,5 +1,4 @@
 import { createAppAuth } from "@octokit/auth-app";
-import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
 import { OctokitOptions } from "@octokit/core/dist-types/types";
 import { ThrottlingOptions } from "@octokit/plugin-throttling/dist-types/types";
 import { Octokit } from "@octokit/rest";
@@ -10,33 +9,28 @@ import { GitHubInstance, GitHubOptions } from "src/github/types";
 import {
   GitHubAppAuthSchema,
   GitHubAppInstallationAuthSchema,
-  GitHubAppOAuthSchema,
   GitHubTokenAuthSchema,
 } from "src/schemas/GitHubConfigEnvSchema";
-import {
-  GitHubAppAuthEnv,
-  GitHubAppInstallationAuthEnv,
-  GitHubAppOAuthEnv,
-  GitHubTokenAuthEnv,
-} from "src/types/generated";
+import { GitHubAppAuthEnv, GitHubAppInstallationAuthEnv, GitHubTokenAuthEnv } from "src/types/generated";
 import { defaultLogger, lazyApi } from "src/utils";
 
-export function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
+export async function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
   let authStrategy: OctokitOptions["authStrategy"];
   let auth: OctokitOptions["auth"];
 
   switch (opts.authType) {
     case "app":
       authStrategy = createAppAuth;
-      auth = { appId: opts.appId, privateKey: opts.privateKey };
+      auth = { appId: opts.appId, privateKey: opts.privateKey, type: "app" };
       break;
     case "installation":
       authStrategy = createAppAuth;
-      auth = { appId: opts.appId, installationId: opts.installationId, privateKey: opts.privateKey };
-      break;
-    case "oauth":
-      authStrategy = createOAuthAppAuth;
-      auth = { clientId: opts.clientId, clientSecret: opts.clientSecret };
+      auth = {
+        appId: opts.appId,
+        installationId: opts.installationId,
+        privateKey: opts.privateKey,
+        type: "installation",
+      };
       break;
     case "token":
       auth = opts.authToken;
@@ -73,10 +67,14 @@ export function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
     baseUrl: opts.apiEndpoint ?? "https://api.github.com",
     throttle,
   });
-  const token = auth.token;
-
-  return Promise.resolve({ ...octokitInstance, token });
   /* eslint-enable @typescript-eslint/no-unsafe-assignment */
+
+  if (opts.authType === "app") {
+    return { ...octokitInstance, authType: "app" };
+  }
+
+  const { token } = (await octokitInstance.auth(auth)) as { token: string };
+  return { ...octokitInstance, authType: opts.authType, token };
 }
 
 export type Setup = {
@@ -85,7 +83,7 @@ export type Setup = {
 };
 
 export async function resolveSetup(options?: GitHubOptions): Promise<Setup> {
-  const octokit: GitHubInstance = options?.octokitInstance ?? (await setupCommonInstance(getConfigOptsFromEnv()));
+  const octokit = options?.octokitInstance ?? (await setupCommonInstance(getConfigOptsFromEnv()));
   const logger = options?.logger ?? defaultLogger;
 
   bindLogger(octokit, logger);
@@ -102,9 +100,9 @@ export function bindLogger(octokit: Octokit, logger: Logger): void {
   });
 }
 
-export const setupCommonInstance: (opts: GitHubConfigOpts) => Promise<GitHubInstance> = lazyApi(getInstance);
+export const setupCommonInstance = lazyApi(getInstance);
 
-export function getConfigOptsFromEnv(): GitHubConfigOpts {
+function getConfigOptsFromEnv(): GitHubConfigOpts {
   const message = "Invalid environment for GitHub integration. Consult README.md";
 
   if (process.env.GITHUB_PRIVATE_KEY_BASE64 && !process.env.GITHUB_PRIVATE_KEY) {
@@ -130,14 +128,6 @@ export function getConfigOptsFromEnv(): GitHubConfigOpts {
       privateKey: installationAuthEnv.GITHUB_PRIVATE_KEY,
       installationId: installationAuthEnv.GITHUB_INSTALLATION_ID,
     };
-  } else if (process.env.GITHUB_AUTH_TYPE === "oauth") {
-    const installationPrivkeyAuthEnv = validate<GitHubAppOAuthEnv>(process.env, GitHubAppOAuthSchema, { message });
-    return {
-      authType: "oauth",
-      ...(installationPrivkeyAuthEnv.GITHUB_BASE_URL && { apiEndpoint: installationPrivkeyAuthEnv.GITHUB_BASE_URL }),
-      clientId: installationPrivkeyAuthEnv.GITHUB_CLIENT_ID,
-      clientSecret: installationPrivkeyAuthEnv.GITHUB_CLIENT_SECRET,
-    };
   } else {
     const tokenAuthEnv = validate<GitHubTokenAuthEnv>(process.env, GitHubTokenAuthSchema, { message });
     return {
@@ -150,5 +140,11 @@ export function getConfigOptsFromEnv(): GitHubConfigOpts {
 
 export async function getFetchEndpoint(options?: GitHubOptions): Promise<{ token: string; url: string }> {
   const setup = await resolveSetup(options);
-  return { url: `https://x-access-token:${setup.octokit.token}@github.com`, token: setup.octokit.token };
+  if (setup.octokit.authType !== "token" && setup.octokit.authType !== "installation") {
+    throw new Error(
+      `getFetchEndpoint can only be used with "installation" or "token" authType. Got "${setup.octokit.authType}" instead`,
+    );
+  }
+  const token = setup.octokit.token;
+  return { url: `https://x-access-token:${setup.octokit.token}@github.com`, token };
 }

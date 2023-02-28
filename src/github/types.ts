@@ -23,12 +23,6 @@ type GitHubConfigInstallationPrivkeyAuthOpts = GitHubConfigBaseOpts & {
   installationId: string;
 };
 
-type GitHubConfigInstallationOAuthOpts = GitHubConfigBaseOpts & {
-  authType: "oauth";
-  clientId: string;
-  clientSecret: string;
-};
-
 type GitHubConfigTokenAuthOpts = GitHubConfigBaseOpts & {
   authType: "token";
   authToken: string;
@@ -37,7 +31,15 @@ type GitHubConfigTokenAuthOpts = GitHubConfigBaseOpts & {
 export type GitHubConfigOpts =
   | GitHubConfigAppAuthOpts
   | GitHubConfigInstallationPrivkeyAuthOpts
-  | GitHubConfigInstallationOAuthOpts
   | GitHubConfigTokenAuthOpts;
 
-export type GitHubInstance = Octokit & { token: string };
+export type GitHubInstance = Octokit &
+  (
+    | {
+        authType: "installation" | "token";
+        token: string;
+      }
+    | {
+        authType: "app";
+      }
+  );
