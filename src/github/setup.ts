@@ -1,8 +1,8 @@
+import { Logger, validate } from "@eng-automation/js";
 import { createAppAuth } from "@octokit/auth-app";
 import { OctokitOptions } from "@octokit/core/dist-types/types";
 import { ThrottlingOptions } from "@octokit/plugin-throttling/dist-types/types";
 import { Octokit } from "@octokit/rest";
-import { Logger, validate } from "opstooling-js";
 
 import { GitHubConfigOpts } from "src/github";
 import { GitHubInstance, GitHubOptions } from "src/github/types";
