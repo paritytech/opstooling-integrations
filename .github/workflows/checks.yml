@@ -24,7 +24,7 @@ jobs:
         key: node_modules+${{ hashFiles('**/yarn.lock') }}
 
     - name: Install
-      run: yarn install --immutable
+      run: yarn install --frozen-lockfile
 
     - name: Lint
       run: yarn lint

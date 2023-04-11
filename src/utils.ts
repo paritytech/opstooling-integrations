@@ -1,4 +1,4 @@
-import { Logger } from "opstooling-js";
+import { Logger } from "@eng-automation/js";
 
 export function lazyApi<T, O>(setup: (opts: O) => Promise<T>): (opts: O) => Promise<T> {
   let promise: Promise<T>;
