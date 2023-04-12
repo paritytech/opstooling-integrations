@@ -15,7 +15,7 @@
     "joi": "^17.6.4"
   },
   "devDependencies": {
-    "opstooling-js-style": "https://github.com/paritytech/opstooling-js-style#52e33172beaefbc82d56842c77a0e1c5aaa772a0",
+    "@eng-automation/js-style": "^2.0.0",
     "prettier": "^2.7.1",
     "ts-patch": "^2.0.2",
     "typescript": "^4.6.2",
