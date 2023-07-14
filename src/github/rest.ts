@@ -49,6 +49,8 @@ export const listMatchingRefs = makeMethod("git", "listMatchingRefs");
 export const getTags = makePaginateMethod("GET /repos/{owner}/{repo}/tags");
 export const createCommitStatus = makeMethod("repos", "createCommitStatus");
 export const createComment = makeMethod("issues", "createComment");
+export const createReactionForIssue = makeMethod("reactions", "createForIssue");
+export const createReactionForIssueComment = makeMethod("reactions", "createForIssueComment");
 
 export async function isGithubOrganizationMember(
   params: { org: string; username: string },
