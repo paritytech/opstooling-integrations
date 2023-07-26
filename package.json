@@ -6,7 +6,7 @@
   "author": "Parity <admin@parity.io> (https://parity.io)",
   "license": "Apache-2.0",
   "dependencies": {
-    "@eng-automation/js": "^1.0.0",
+    "@eng-automation/js": "^1.0.2",
     "@octokit/auth-app": "^4.0.7",
     "@octokit/core": "^4.1.0",
     "@octokit/plugin-paginate-rest": "^6.0.0",

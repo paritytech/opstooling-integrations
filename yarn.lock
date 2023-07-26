@@ -210,10 +210,10 @@
     prettier-plugin-svelte "^2.8.1"
     svelte "^3.54.0"
 
-"@eng-automation/js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@eng-automation/js/-/js-1.0.0.tgz#f6bd5e36f1ab047cdf185be913283788432003b0"
-  integrity sha512-LHRJYdug9zhCHGUBJc4KdPIlAKLFMC4sTgIT2fqrM2+v61e/y51fijrxRQ86gzcNG+ODrYJf0+9pCH5bNbaFTA==
+"@eng-automation/js@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@eng-automation/js/-/js-1.0.2.tgz#4f4380cc9f1f468b99a8445fa05b5ae7055e6cbd"
+  integrity sha512-FXX3z50ZI4iJI7ojkqt3R4fYE35mPVGqB3mQQQWb58Xf8LRXkwz2CiLUNGkw1cZpEuTsC44q5RYhP+7Vt+VSZg==
   dependencies:
     async-mutex "^0.3.2"
     commander "^9.3.0"
@@ -2405,14 +2405,7 @@ semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.3.7:
-  version "7.5.4"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
-  integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
-  dependencies:
-    lru-cache "^6.0.0"
-
-semver@^7.5.3:
+semver@^7.3.7, semver@^7.5.3:
   version "7.5.4"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
   integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
