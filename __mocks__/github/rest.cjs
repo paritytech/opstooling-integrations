@@ -24,3 +24,7 @@ exports.getRepoInstallation = jest.fn(async () => Promise.reject({ status: 404, 
 
 exports.isGithubOrganizationMember = jest.fn(async () => Promise.resolve(false));
 exports.isGithubTeamMember = jest.fn(async () => Promise.resolve(false));
+
+exports.getFileContent = jest.fn(async ({ owner, repo, path }) =>
+  Promise.reject(new Error(`File ${owner}/${repo}/${path} doesn't exist`)),
+);
