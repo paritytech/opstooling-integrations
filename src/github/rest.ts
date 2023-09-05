@@ -88,3 +88,28 @@ export async function isGithubTeamMember(
     throw e;
   }
 }
+
+export async function getFileContent(
+  params: {
+    owner: string;
+    repo: string;
+    path: string;
+  },
+  options?: GitHubOptions,
+): Promise<string> {
+  const { octokit } = await resolveSetup(options);
+
+  const res = await octokit.repos
+    .getContent({ owner: params.owner, repo: params.repo, path: params.path })
+    .catch((e) => {
+      if (e.status === 404) {
+        throw new Error(`File ${params.owner}/${params.repo}/${params.path} doesn't exist`);
+      }
+      throw e;
+    });
+  if (Array.isArray(res.data) || res.data.type !== "file") {
+    throw new Error(`${params.owner}/${params.repo}/${params.path} is not a file`);
+  }
+
+  return Buffer.from(res.data.content, "base64").toString();
+}
