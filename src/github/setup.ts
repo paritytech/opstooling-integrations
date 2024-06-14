@@ -3,16 +3,15 @@ import { createAppAuth } from "@octokit/auth-app";
 import { OctokitOptions } from "@octokit/core/dist-types/types";
 import { ThrottlingOptions } from "@octokit/plugin-throttling/dist-types/types";
 import { Octokit } from "@octokit/rest";
-
-import { GitHubConfigOpts } from "src/github";
-import { GitHubInstance, GitHubOptions } from "src/github/types";
+import { GitHubConfigOpts } from "#src/github";
+import { GitHubInstance, GitHubOptions } from "#src/github/types";
 import {
   GitHubAppAuthSchema,
   GitHubAppInstallationAuthSchema,
   GitHubTokenAuthSchema,
-} from "src/schemas/GitHubConfigEnvSchema";
-import { GitHubAppAuthEnv, GitHubAppInstallationAuthEnv, GitHubTokenAuthEnv } from "src/types/generated";
-import { defaultLogger, lazyApi } from "src/utils";
+} from "#src/schemas/GitHubConfigEnvSchema";
+import { GitHubAppAuthEnv, GitHubAppInstallationAuthEnv, GitHubTokenAuthEnv } from "#src/types/generated";
+import { defaultLogger, lazyApi } from "#src/utils";
 
 export async function getInstance(opts: GitHubConfigOpts): Promise<GitHubInstance> {
   let authStrategy: OctokitOptions["authStrategy"];

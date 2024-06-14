@@ -1,5 +1,5 @@
-import { resolveSetup } from "src/github/setup";
-import { GitHubOptions } from "src/github/types";
+import { resolveSetup } from "#src/github/setup";
+import { GitHubOptions } from "#src/github/types";
 
 // Name pick is a bit wonky, although as comprehensive as possible
 export async function getRepoNameAndOwnerFromNodeId(

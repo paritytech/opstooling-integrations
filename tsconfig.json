@@ -8,10 +8,8 @@
     "allowJs": true,
     "moduleResolution": "node",
     "module": "commonjs",
-    "target": "ES2021",
-    // Node.js LTS 16
-    "lib": ["ES2021"],
-    // Node.js LTS 16
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
@@ -21,19 +19,9 @@
     "types": ["node"],
     "typeRoots": ["./node_modules/@types", "./src"],
     "paths": {
-      "src/*": ["./src/*"]
+      "#src/*": ["./src/*"]
     },
-    "plugins": [
-      // Transform paths in output .js files
-      {
-        "transform": "typescript-transform-paths"
-      },
-      // Transform paths in output .d.ts files (Include this line if you output declarations files)
-      {
-        "transform": "typescript-transform-paths",
-        "afterDeclarations": true
-      }
-    ]
+    "plugins": []
   },
   "include": ["src"]
 }

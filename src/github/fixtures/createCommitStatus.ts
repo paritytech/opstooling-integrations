@@ -1,4 +1,4 @@
-import { createCommitStatus } from "src/github/rest";
+import { createCommitStatus } from "#src/github/rest";
 
 type CommitStatusSuccess = Awaited<ReturnType<typeof createCommitStatus>>;
 
