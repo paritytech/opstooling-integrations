@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 22.x
 
       - name: Use cached node_modules
         uses: actions/cache@v1
@@ -27,7 +27,7 @@ jobs:
           key: node_modules+${{ hashFiles('**/yarn.lock') }}
 
       - name: Install
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build
         run: yarn build

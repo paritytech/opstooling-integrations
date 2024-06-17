@@ -1,6 +1,5 @@
 import { Octokit } from "@octokit/rest";
-
-import { BaseOptions } from "src/types";
+import { BaseOptions } from "#src/types";
 
 export type GitHubOptions = BaseOptions & {
   octokitInstance?: GitHubInstance;
